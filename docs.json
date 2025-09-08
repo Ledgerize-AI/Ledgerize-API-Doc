@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Ledgerize API",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#B57EFC",
+    "light": "#FF9AEC",
+    "dark": "#00FFDD"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -15,7 +15,7 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["index", "quickstart", "authentication", "errors"]
+            "pages": ["index", "quickstart", "authentication", "errors", "code-examples"]
           },
           {
             "group": "Endpoints",
@@ -37,16 +37,16 @@
     "global": {
       "anchors": [
         { "anchor": "Home", "href": "https://ledgerize.ai", "icon": "house" },
-        { "anchor": "Pricing", "href": "https://ledgerize.ai/pricing", "icon": "tag" }
+        { "anchor": "Pricing", "href": "https://ledgerize.ai/pricing", "icon": "tag" },
+        { "anchor": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json", "icon": "file" }
       ]
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
   "navbar": {
-    "links": [{ "label": "Support", "href": "mailto:support@ledgerize.ai" }],
+    "links": [
+      { "label": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json" },
+      { "label": "Support", "href": "mailto:support@ledgerize.ai" }
+    ],
     "primary": { "type": "button", "label": "Get started", "href": "https://ledgerize.ai" }
   },
   "contextual": {
