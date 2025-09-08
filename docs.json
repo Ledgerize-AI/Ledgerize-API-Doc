@@ -38,7 +38,7 @@
       "anchors": [
         { "anchor": "Home", "href": "https://ledgerize.ai", "icon": "house" },
         { "anchor": "Pricing", "href": "https://ledgerize.ai/pricing", "icon": "tag" },
-        { "anchor": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json", "icon": "file" }
+        { "anchor": "Postman Collection", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json", "icon": "file" }
       ]
     }
   },
