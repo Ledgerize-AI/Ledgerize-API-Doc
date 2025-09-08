@@ -3,8 +3,8 @@
   "theme": "mint",
   "name": "Ledgerize API",
   "colors": {
-    "primary": "#B57EFC",
-    "light": "#FF9AEC",
+    "primary": "#FF9AEC",
+    "light": "#B57EFC",
     "dark": "#00FFDD"
   },
   "favicon": "/favicon.svg",
@@ -41,6 +41,10 @@
         { "anchor": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json", "icon": "file" }
       ]
     }
+  },
+  "logo": {
+    "light": "/images/ledgerize-logo.png",
+    "dark": "/images/ledgerize-logo.png"
   },
   "navbar": {
     "links": [
