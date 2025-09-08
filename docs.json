@@ -49,7 +49,7 @@
   "navbar": {
     "links": [
       { "label": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json" },
-      { "label": "Support", "href": "mailto:support@ledgerize.ai" }
+      { "label": "Support", "href": "https://ledgerize.ai/contact-us" }
     ],
     "primary": { "type": "button", "label": "Get started", "href": "https://ledgerize.ai" }
   },
