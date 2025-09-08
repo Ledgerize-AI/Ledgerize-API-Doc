@@ -3,8 +3,8 @@
   "theme": "mint",
   "name": "Ledgerize API",
   "colors": {
-    "primary": "#FF9AEC",
-    "light": "#B57EFC",
+    "primary": "#B57EFC",
+    "light": "#FF9AEC",
     "dark": "#00FFDD"
   },
   "favicon": "/favicon.svg",
