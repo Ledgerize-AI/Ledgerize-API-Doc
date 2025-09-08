@@ -1,0 +1,263 @@
+openapi: 3.1.0
+info:
+  title: Ledgerize Public API
+  version: 1.0.0
+  description: |
+    Convert bank statement PDFs into structured data via the Ledgerize API.
+    Authentication uses an API key sent in the `X-Api-Key` header.
+servers:
+  - url: https://ledgerize.ai
+    description: Production
+  - url: https://localhost:3000
+    description: Local (development)
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+          required: [code, message]
+      examples:
+        auth:
+          value:
+            error:
+              code: AUTH_INVALID_KEY
+              message: Invalid or missing API key
+        rateLimit:
+          value:
+            error:
+              code: RATE_LIMITED
+              message: Too many requests
+    UploadResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+        pages:
+          type: integer
+          minimum: 1
+      required: [uuid]
+      examples:
+        default:
+          value:
+            uuid: "2d09c956-854d-434d-a1bb-872d0a2cf44f"
+            pages: 3
+    ConvertRequest:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+        format:
+          type: string
+          enum: [JSON, CSV, XLS]
+          default: JSON
+      required: [ids]
+    ConvertAccepted:
+      type: object
+      properties:
+        jobId:
+          type: string
+        accepted:
+          type: array
+          items:
+            type: string
+      required: [jobId, accepted]
+    JobStatus:
+      type: object
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+      required: [jobId, status]
+    JsonResult:
+      type: object
+      properties:
+        normalised:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      examples:
+        default:
+          value:
+            normalised:
+              - { date: "2025-03-13", description: "Start balance", balance: "1042.38" }
+              - { date: "2025-03-14", description: "Card Payment", money_out: "15.95", balance: "1026.43" }
+  responses:
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+security:
+  - ApiKey: []
+paths:
+  /api/v1/files:
+    post:
+      summary: Upload a bank statement PDF
+      operationId: uploadFile
+      description: |
+        Upload a PDF via multipart/form-data and receive a UUID for conversion. Typical size limits are 25MB.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                filename:
+                  type: string
+            examples:
+              default:
+                value:
+                  filename: statement.pdf
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+              examples:
+                default:
+                  $ref: '#/components/schemas/UploadResponse/examples/default'
+        '4XX':
+          $ref: '#/components/responses/ErrorResponse'
+        '5XX':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/v1/files/{uuid}/password:
+    post:
+      summary: Provide password for a protected PDF
+      operationId: setPassword
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required: [password]
+      responses:
+        '200':
+          description: OK
+        '4XX':
+          $ref: '#/components/responses/ErrorResponse'
+        '5XX':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/v1/convert:
+    post:
+      summary: Start conversion for one or more uploaded files
+      operationId: convert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertRequest'
+            examples:
+              default:
+                value:
+                  ids: ["2d09c956-854d-434d-a1bb-872d0a2cf44f"]
+                  format: JSON
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertAccepted'
+        '4XX':
+          $ref: '#/components/responses/ErrorResponse'
+        '5XX':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/v1/jobs/{jobId}:
+    get:
+      summary: Get job status
+      operationId: getJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatus'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/jobs/{jobId}/result:
+    get:
+      summary: Download the conversion result
+      operationId: getResult
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success (JSON example). For CSV/XLS, content type will be `text/csv` or `application/vnd.ms-excel`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResult'
+              examples:
+                default:
+                  $ref: '#/components/schemas/JsonResult/examples/default'
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
