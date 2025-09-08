@@ -1,0 +1,18 @@
+# Convert
+
+`POST /api/v1/convert`
+
+Start a conversion for one or more uploaded UUIDs. Supported formats: `JSON`, `CSV`, `XLS`.
+
+```bash
+curl -s -X POST \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"ids":["<uuid>"],"format":"JSON"}' \
+  https://ledgerize.ai/api/v1/convert
+```
+
+Response
+```json
+{ "jobId": "job_123", "accepted": ["<uuid>"] }
+```

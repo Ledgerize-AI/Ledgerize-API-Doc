@@ -1,0 +1,18 @@
+# Upload
+
+`POST /api/v1/files` (multipart/form-data)
+
+Send a PDF and receive a UUID for conversion.
+
+```bash
+curl -s -X POST \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -F file=@statement.pdf \
+  https://ledgerize.ai/api/v1/files
+```
+
+Response
+
+```json
+{ "uuid": "2d09c956-854d-434d-a1bb-872d0a2cf44f", "pages": 3 }
+```

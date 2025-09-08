@@ -1,0 +1,15 @@
+# Jobs
+
+## Status
+`GET /api/v1/jobs/{jobId}`
+
+Returns job status and progress.
+
+## Result
+`GET /api/v1/jobs/{jobId}/result`
+
+Returns the converted data. For `JSON`, the response is JSON; for `CSV`/`XLS`, a file download.
+
+```json
+{ "normalised": [ { "date": "2025-03-13", "description": "Start balance" } ] }
+```

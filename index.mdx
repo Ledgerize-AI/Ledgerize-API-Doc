@@ -1,11 +1,12 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Ledgerize API"
+description: "Convert bank statement PDFs into structured data"
 ---
 
-## Setting up
+## Overview
 
-Get your documentation site up and running in minutes.
+Ledgerize lets you convert bank statement PDFs into clean, structured data via simple HTTP endpoints.
+Authenticate with an API key in the `X-Api-Key` header, upload a PDF, start a conversion, poll a job, and fetch the result.
 
 <Card
   title="Start here"
@@ -16,42 +17,16 @@ Get your documentation site up and running in minutes.
   Follow our three step quickstart guide.
 </Card>
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
+## Quick links
 
 <Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">Start with cURL and Node.js examples.</Card>
+  <Card title="Authentication" icon="key" href="/authentication">Use the X-Api-Key header.</Card>
+  <Card title="Upload" icon="file-arrow-up" href="/endpoints/upload">Upload a PDF and get a UUID.</Card>
+  <Card title="Convert & Jobs" icon="rotate" href="/endpoints/convert">Convert, poll, and fetch results.</Card>
 </Columns>
 
-## Create beautiful pages
+
 
 Everything you need to create world-class documentation.
 
@@ -86,12 +61,9 @@ Everything you need to create world-class documentation.
   </Card>
 </Columns>
 
-## Need inspiration?
+## Resources
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Columns cols={2}>
+  <Card title="API Reference" icon="terminal" href="/api-reference">Auto‑generated from OpenAPI.</Card>
+  <Card title="Postman" icon="file" href="https://ledgerize.ai/postman/ledgerize.postman_collection.json">Download the collection.</Card>
+</Columns>
