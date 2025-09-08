@@ -61,6 +61,6 @@
      "vscode"
    ]
   },
-  "api": { "openapi": ["https://ledgerize.ai/openapi/openapi.yaml"] },
+  
   "footer": { "socials": { "x": "https://x.com/ledgerize", "github": "https://github.com/wishfulcynic", "linkedin": "https://linkedin.com/company/ledgerize" } }
 }
