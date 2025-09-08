@@ -1,0 +1,67 @@
+---
+title: Code Examples
+---
+
+# Code Examples
+
+## Node.js (fetch + FormData)
+
+```ts
+import fs from 'fs/promises';
+
+const key = process.env.LEDGERIZE_API_KEY!;
+const base = 'https://ledgerize.ai';
+
+// 1) Upload
+const fd = new FormData();
+fd.append('file', new Blob([await fs.readFile('statement.pdf')], { type: 'application/pdf' }), 'statement.pdf');
+const up = await fetch(base + '/api/v1/files', { method: 'POST', headers: { 'X-Api-Key': key }, body: fd }).then(r => r.json());
+console.log('uuid:', up.uuid);
+
+// 2) Convert
+const job = await fetch(base + '/api/v1/convert', {
+  method: 'POST',
+  headers: { 'X-Api-Key': key, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ ids: [up.uuid], format: 'JSON' })
+}).then(r => r.json());
+console.log('jobId:', job.jobId);
+
+// 3) Poll
+let status;
+do {
+  status = await fetch(`${base}/api/v1/jobs/${job.jobId}`, { headers: { 'X-Api-Key': key } }).then(r => r.json());
+} while (status.status !== 'completed');
+
+// 4) Result (JSON)
+const result = await fetch(`${base}/api/v1/jobs/${job.jobId}/result`, { headers: { 'X-Api-Key': key } }).then(r => r.json());
+console.log(result.normalised.slice(0, 3));
+
+// CSV result (download)
+const buf = await fetch(`${base}/api/v1/jobs/${job.jobId}/result`, { headers: { 'X-Api-Key': key } }).then(r => r.arrayBuffer());
+await fs.writeFile('statement.csv', Buffer.from(buf));
+console.log('Saved statement.csv');
+```
+
+## cURL
+
+```bash
+# Upload
+curl -s -X POST \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -F file=@statement.pdf \
+  https://ledgerize.ai/api/v1/files
+
+# Convert (JSON)
+curl -s -X POST \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"ids":["<uuid>"],"format":"JSON"}' \
+  https://ledgerize.ai/api/v1/convert
+
+# Poll
+curl -s -H "X-Api-Key: $LEDGERIZE_API_KEY" https://ledgerize.ai/api/v1/jobs/<jobId>
+
+# Result
+curl -s -H "X-Api-Key: $LEDGERIZE_API_KEY" https://ledgerize.ai/api/v1/jobs/<jobId>/result
+```
+
