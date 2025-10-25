@@ -1,0 +1,40 @@
+---
+title: 'API Reference'
+description: 'Schemas and endpoints for uploading statements, converting jobs, and retrieving results.'
+---
+
+<Note>
+  Every endpoint documented in the sidebar is generated from <Code>api-reference/openapi.yaml</Code>.
+  Update that OpenAPI file whenever the Ledgerize API changes to keep this reference in sync.
+</Note>
+
+## Overview
+
+All endpoints are hosted under <Code>https://ledgerize.ai/api/v1</Code> and require an API key in the
+<Code>X-Api-Key</Code> header. Requests should be made over HTTPS.
+
+```http
+X-Api-Key: YOUR_LEDGERIZE_API_KEY
+Content-Type: application/json
+```
+
+## Workflow
+
+1. **Upload** bank-statement PDFs via `POST /files` (multipart form). The response includes a `uuid`
+   you use for conversions.
+2. **Convert** one or more UUIDs with `POST /convert`. Choose `JSON`, `CSV`, or `XLS` formats and
+   Ledgerize will start an asynchronous job.
+3. **Check job status** using `GET /jobs/{jobId}`. When the job is `completed`, fetch the results at
+   `GET /jobs/{jobId}/result`.
+
+## OpenAPI
+
+Use the button below to download the exact OpenAPI definition served in this reference.
+
+<Card
+  title="Ledgerize API OpenAPI"
+  icon="sparkles"
+  href="/api-reference/openapi.yaml"
+>
+  Download the latest OpenAPI specification
+</Card>
