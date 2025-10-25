@@ -35,7 +35,7 @@
       "anchors": [
         { "anchor": "Home", "href": "https://ledgerize.ai", "icon": "house" },
         { "anchor": "Pricing", "href": "https://ledgerize.ai/pricing", "icon": "tag" },
-        { "anchor": "Postman Collection", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json", "icon": "file" }
+        { "anchor": "Postman Collection", "href": "https://ledgerize.ai/api/download/postman-collection", "icon": "file" }
       ]
     }
   },
@@ -45,7 +45,7 @@
   },
   "navbar": {
     "links": [
-      { "label": "Postman", "href": "https://ledgerize.ai/postman/ledgerize.postman_collection.json" },
+      { "label": "Postman", "href": "https://ledgerize.ai/api/download/postman-collection" },
       { "label": "Support", "href": "https://ledgerize.ai/contact-us" }
     ],
     "primary": { "type": "button", "label": "Get started", "href": "https://ledgerize.ai" }
