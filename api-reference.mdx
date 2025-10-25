@@ -1,40 +1,134 @@
 ---
 title: 'API Reference'
-description: 'Schemas and endpoints for uploading statements, converting jobs, and retrieving results.'
+description: 'Everything you need to call the Ledgerize API: authentication, endpoints, workflows, and schema definitions.'
 ---
 
 <Note>
-  Every endpoint documented in the sidebar is generated from <Code>api-reference/openapi.yaml</Code>.
-  Update that OpenAPI file whenever the Ledgerize API changes to keep this reference in sync.
+  This reference is powered by <Code>api-reference/openapi.yaml</Code>. Whenever the API changes,
+  update the OpenAPI file first—Mintlify will regenerate every endpoint page automatically.
 </Note>
 
-## Overview
-
-All endpoints are hosted under <Code>https://ledgerize.ai/api/v1</Code> and require an API key in the
-<Code>X-Api-Key</Code> header. Requests should be made over HTTPS.
+## Base URL & Versioning
 
 ```http
-X-Api-Key: YOUR_LEDGERIZE_API_KEY
-Content-Type: application/json
+Base URL: https://ledgerize.ai/api/v1
+Status: Stable (v1)
 ```
 
-## Workflow
+Ledgerize exposes a RESTful surface. All endpoints require TLS and are versioned with the `/v1`
+prefix. Non-GET endpoints accept/return JSON unless noted otherwise.
 
-1. **Upload** bank-statement PDFs via `POST /files` (multipart form). The response includes a `uuid`
-   you use for conversions.
-2. **Convert** one or more UUIDs with `POST /convert`. Choose `JSON`, `CSV`, or `XLS` formats and
-   Ledgerize will start an asynchronous job.
-3. **Check job status** using `GET /jobs/{jobId}`. When the job is `completed`, fetch the results at
-   `GET /jobs/{jobId}/result`.
+### Authentication
 
-## OpenAPI
+- **Header**: `X-Api-Key: YOUR_LEDGERIZE_API_KEY`
+- Keys are managed inside the Ledgerize dashboard (Credits → API Keys).
+- Rate limit: 60 requests/minute per key (contact us for higher throughput).
 
-Use the button below to download the exact OpenAPI definition served in this reference.
+| Header       | Required | Description                                     |
+|--------------|----------|-------------------------------------------------|
+| `X-Api-Key`  | ✅       | Identifies the workspace; required everywhere. |
+| `Content-Type` | ⚠️     | `application/json` for JSON bodies, `multipart/form-data` for uploads. |
 
-<Card
-  title="Ledgerize API OpenAPI"
-  icon="sparkles"
-  href="/api-reference/openapi.yaml"
->
-  Download the latest OpenAPI specification
-</Card>
+## Endpoint Summary
+
+| Method | Path                              | Purpose                                                    |
+|--------|-----------------------------------|------------------------------------------------------------|
+| `POST` | `/files`                          | Upload a PDF and receive a `uuid` token for conversions.   |
+| `POST` | `/files/{uuid}/password`          | Provide a password for a protected PDF after upload.       |
+| `POST` | `/convert`                        | Kick off a conversion job for one or more uploaded files.  |
+| `GET`  | `/jobs/{jobId}`                   | Poll job status (`pending → processing → completed`).      |
+| `GET`  | `/jobs/{jobId}/result`            | Retrieve the normalized output once the job completes.     |
+
+Each endpoint above links to a detailed page in the sidebar with parameters, schema definitions,
+example responses, and error codes—all driven by the OpenAPI spec.
+
+## Typical Workflow
+
+1. **Upload** the statement.
+2. **(Optional)** provide a password if the PDF is encrypted.
+3. **Convert** and capture the returned `jobId`.
+4. **Poll** the job until it succeeds.
+5. **Download** the structured output.
+
+<CodeGroup>
+```bash cURL
+# 1) Upload
+curl -s -X POST https://ledgerize.ai/api/v1/files \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -F file=@statement.pdf
+
+# 2) Convert
+curl -s -X POST https://ledgerize.ai/api/v1/convert \
+  -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "ids": ["uuid-from-upload"], "format": "JSON" }'
+
+# 3) Poll status
+curl -s -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  https://ledgerize.ai/api/v1/jobs/j_123
+
+# 4) Fetch result
+curl -s -H "X-Api-Key: $LEDGERIZE_API_KEY" \
+  https://ledgerize.ai/api/v1/jobs/j_123/result
+```
+
+```ts Node.js
+const key = process.env.LEDGERIZE_API_KEY!;
+const base = 'https://ledgerize.ai/api/v1';
+
+const fd = new FormData();
+fd.append('file', new Blob([await fs.readFile('statement.pdf')], { type: 'application/pdf' }));
+const upload = await fetch(`${base}/files`, { method: 'POST', headers: { 'X-Api-Key': key }, body: fd }).then(r => r.json());
+
+const job = await fetch(`${base}/convert`, {
+  method: 'POST',
+  headers: { 'X-Api-Key': key, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ ids: [upload.uuid], format: 'JSON' })
+}).then(r => r.json());
+
+let status;
+do {
+  status = await fetch(`${base}/jobs/${job.jobId}`, { headers: { 'X-Api-Key': key } }).then(r => r.json());
+} while (status.status !== 'completed');
+
+const result = await fetch(`${base}/jobs/${job.jobId}/result`, { headers: { 'X-Api-Key': key } }).then(r => r.json());
+console.log(result.normalised.slice(0, 3));
+```
+</CodeGroup>
+
+## Error Handling
+
+Ledgerize normalizes errors into the shape below. The `error.code` field lets you build deterministic
+logic around common scenarios.
+
+```json
+{
+  "error": {
+    "code": "AUTH_INVALID_KEY",
+    "message": "Invalid or missing API key",
+    "details": {}
+  }
+}
+```
+
+Common codes:
+
+- `AUTH_INVALID_KEY` – API key missing or incorrect.
+- `RATE_LIMITED` – Exceeded per-key allowance (60 req/min).
+- `FILE_REQUIRED` – Upload request missing the `file` field.
+- `PASSWORD_REQUIRED` – Called `/files/{uuid}/password` without a password payload.
+- `UPLOAD_FAILED`, `CONVERT_FAILED`, `SET_PASSWORD_FAILED` – Upstream processing errors. Retry or contact support.
+
+## Tools & Downloads
+
+<CardGroup>
+  <Card title="OpenAPI Spec" icon="sparkles" href="/api-reference/openapi.yaml">
+    Exact schema used to generate this reference. Import into Insomnia, Postman, or Speakeasy.
+  </Card>
+  <Card title="Postman Collection" icon="bolt" href="https://ledgerize.ai/postman/ledgerize.postman_collection.json">
+    Ready-made Postman collection with environment variables for API key and base URL.
+  </Card>
+  <Card title="Support" icon="life-buoy" href="https://ledgerize.ai/contact-us">
+    Reach the Ledgerize team for higher limits, dedicated environments, or partnership requests.
+  </Card>
+</CardGroup>
