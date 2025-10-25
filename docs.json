@@ -33,7 +33,7 @@
       {
         "tab": "API Reference",
         "groups": [
-          { "group": "Reference", "pages": ["api-reference"] }
+          { "group": "Reference", "pages": ["api-reference/index"] }
         ]
       }
     ],
