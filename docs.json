@@ -40,8 +40,8 @@
     }
   },
   "logo": {
-    "light": "/images/ledgerize-logo.png",
-    "dark": "/images/ledgerize-logo.png"
+    "light": "/images/ledgerize-logo-light.png",
+    "dark": "/images/ledgerize-logo-dark.png"
   },
   "navbar": {
     "links": [
