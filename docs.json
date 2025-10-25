@@ -30,12 +30,6 @@
           }
         ]
       },
-      {
-        "tab": "API Reference",
-        "groups": [
-          { "group": "Reference", "pages": ["api-reference/index"] }
-        ]
-      }
     ],
     "global": {
       "anchors": [
